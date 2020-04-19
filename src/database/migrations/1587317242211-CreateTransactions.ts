@@ -12,26 +12,32 @@ export default class CreateTransactions1587317242211
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'title',
             type: 'varchar',
+            isNullable: false,
           },
           {
             name: 'type',
             type: 'varchar',
+            isNullable: false,
           },
           {
             name: 'value',
-            type: 'numeric',
+            type: 'int',
+            isNullable: false,
           },
           {
             name: 'created_at',
             type: 'timestamp with time zone',
+            default: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'updated_at',
             type: 'timestamp with time zone',
+            default: 'CURRENT_TIMESTAMP',
           },
         ],
       }),

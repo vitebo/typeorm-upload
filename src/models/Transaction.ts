@@ -14,16 +14,16 @@ class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('varchar')
   title: string;
 
-  @Column()
+  @Column('varchar')
   type: 'income' | 'outcome';
 
-  @Column()
+  @Column('int')
   value: number;
 
-  @Column()
+  @Column('uuid')
   category_id: string;
 
   @ManyToOne(() => Category)
