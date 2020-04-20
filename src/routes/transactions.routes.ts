@@ -21,7 +21,7 @@ transactionsRouter.post('/', async (request, response) => {
     value,
     category,
   });
-  response.json({ transaction });
+  response.json(transaction);
 });
 
 transactionsRouter.delete('/:id', async (request, response) => {

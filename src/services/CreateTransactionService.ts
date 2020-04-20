@@ -27,15 +27,22 @@ class CreateTransactionService {
     value,
     category,
   }: Request): Promise<Transaction> {
-    const newCategory = this.categoriesRepository.create({ title: category });
-    await this.categoriesRepository.save(newCategory);
     const transaction = this.transactionsRepository.create({
       title,
       type,
       value,
-      category_id: newCategory.id,
+      category: await this.setupCategory(category),
     });
     return this.transactionsRepository.save(transaction);
+  }
+
+  private async setupCategory(title: string): Promise<Category> {
+    const category = await this.categoriesRepository.findOne({
+      title,
+    });
+    if (category) return category;
+    const newCategory = this.categoriesRepository.create({ title });
+    return this.categoriesRepository.save(newCategory);
   }
 }
 
