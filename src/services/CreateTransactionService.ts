@@ -1,8 +1,10 @@
 // import AppError from '../errors/AppError';
 
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, Repository, getCustomRepository } from 'typeorm';
+import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 import Category from '../models/Category';
+import AppError from '../errors/AppError';
 
 interface Request {
   title: string;
@@ -12,12 +14,12 @@ interface Request {
 }
 
 class CreateTransactionService {
-  private readonly transactionsRepository: Repository<Transaction>;
+  private readonly transactionsRepository: TransactionsRepository;
 
   private readonly categoriesRepository: Repository<Category>;
 
   constructor() {
-    this.transactionsRepository = getRepository(Transaction);
+    this.transactionsRepository = getCustomRepository(TransactionsRepository);
     this.categoriesRepository = getRepository(Category);
   }
 
@@ -27,6 +29,7 @@ class CreateTransactionService {
     value,
     category,
   }: Request): Promise<Transaction> {
+    await this.assertTransactionValue(value, type);
     const transaction = this.transactionsRepository.create({
       title,
       type,
@@ -34,6 +37,15 @@ class CreateTransactionService {
       category: await this.setupCategory(category),
     });
     return this.transactionsRepository.save(transaction);
+  }
+
+  private async assertTransactionValue(
+    value: number,
+    type: 'income' | 'outcome',
+  ): Promise<void> {
+    if (type !== 'outcome') return;
+    const { total } = await this.transactionsRepository.getBalance();
+    if (total < value) throw new AppError('insufficient funds', 400);
   }
 
   private async setupCategory(title: string): Promise<Category> {
